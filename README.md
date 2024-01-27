@@ -210,3 +210,6 @@ Now that I had something running, I made a few changes:
 1. I changed the input URL to https://mossms.com, a game which I made and is still love.
 2. I changed the categorization prompt to allow "Entertainment" as a category.  This involved changing the Jinja template.
 3. I ran the flow again, and it successfully categorized Mossms as "Entertainment".  I was able to inspect the outputs at each stage, and saw its brief 100 word description of Mossms, which was pretty acceptable, and certainly adequate to do the classification. It worked great!
+
+## Suggestion: Remove flow detail
+I removed `flow.detail.json` and added it to gitignore; this doesn't seem like something that should be saved in git.  It contains the results from your last run.
