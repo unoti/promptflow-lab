@@ -161,7 +161,7 @@ cd examples\flows\web-classification
 pip install -r requirements.txt
 ```
 
-### Install VS Code Extension
+## Install VS Code Extension
 There's a VS Code extension that lets you view and edit these flow DAGs in an awesome way. Let's try installing it.
 Click Here: [Prompt flow VS Code Extension](https://marketplace.visualstudio.com/items?itemName=prompt-flow.prompt-flow) or search for "Prompt flow" in the extensions marketplace, and install it.
 
@@ -175,9 +175,38 @@ code --install-extension .\prompt-flow.prompt-flow-1.9.2.vsix
 
 After that I was able to see that the extension was installed in VS Code by clicking the Extensions icon.
 
-### Flow Types
+## Flow Types
 There are three flow types in Prompt Flow:
 * **Chat Flow.** Used in development of an LLM application.  The Chat Flow is designed for interactive chat with a user.  It has chat_history, chat_input, and chat_output.  There is a simple chat application for deployment purposes.
 * **Standard Flow.** Used in development of an LLM application.  A normal flow, but without the chat history and UI. (Is this correct?)  Generally if you need conversation history, use a Chat Flow, otherwise use a Standard Flow.
 * **Evaluation Flow.** Creates metrics used for offline evaluation of the quality of responses, for example, "Is this answer fact based?"
 
+## Running a Flow
+The [quick start guide](https://microsoft.github.io/promptflow/how-to-guides/quick-start.html) talks about using a "code lens action on top of the yaml editor to trigger flow test".  My screen didn't look like theirs for reasons I have not yet figured out.  First, I had to create an OpenAI connection as described in the Questions section above.  Then, to run the flow, this is what I did:
+1. Open the flow in the Prompt Flow extension using F1 as described in the questions section.
+2. For each of the nodes that use an LLM, select which connection they will use in the dropdown.  (If you don't do this step it's going to error out, because it starts with a different default connection.)
+
+![image](img/set-openai-connection.png)
+
+3. **What's a variant?** I was trying to make sure I had all of the nodes that use the LLM cut over to use my OpenAI connection.  One of the nodes looked like it wanted an OpenAI connection, but it said editing was disabled because there are multiple variants available.
+  * Click on the `summarize_text_content` node (see image below)
+  * Click the little widget to expand the variants.
+  * For each of the variants, select the OpenAI connection to use.
+
+![image](img/select-variants.png)
+
+4. Now you can click the Test button under Flows, examples\flows, web-classification
+
+At this point I got an error: `{'code': 'DeploymentNotFound', 'message': 'The API deployment for this resource does not exist....`
+
+5. Fix deployment. To fix that error, I changed this:
+![image](img/select-deployment.png)
+This is because the deployment names I had in OpenAI were different from how things were set up for this example.  After fixing these for each of the LLM nodes in the flow, I clicked test again.
+
+I was then able to execute the flow from end to end.  There is an input URL specified at the beginning, which was an app on the Google Play store.  The flow fetches the content of the URL, and summarizes it.  Then it runs a prompt which classifies the URL into one of several categories.
+
+## Try my own thing
+Now that I had something running, I made a few changes:
+1. I changed the input URL to https://mossms.com, a game which I made and is still love.
+2. I changed the categorization prompt to allow "Entertainment" as a category.  This involved changing the Jinja template.
+3. I ran the flow again, and it successfully categorized Mossms as "Entertainment".  I was able to inspect the outputs at each stage, and saw its brief 100 word description of Mossms, which was pretty acceptable, and certainly adequate to do the classification. It worked great!
