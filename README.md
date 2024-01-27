@@ -44,6 +44,18 @@ These are questions I had while working through the materials, and things that p
 > Q: I've got the Prompt Flow extension running now. How do I set it up to talk to my Azure OpenAI instance?
 Once you have the extension running as above using F1 and then "Prompt Flow: Focus on Flows View" you will have a new icon on the left side of VS Code, a stylize "P" that is the Prompt Flow icon.  In there, you can click on that, and use the "Connections" window.  I discovered later this is discussed in the [docs: Manage Connections](https://microsoft.github.io/promptflow/how-to-guides/manage-connections.html).
 
+Steps I did:
+1. In the [P] prompt flow extension area, under "Connections", under "Azure OpenAI" click +.
+    * This opens a new (temporary) yaml file, where I can enter the information needed.
+2. Go to the Azure Portal and get my Open AI connection information.
+    * In the portal, go to "Keys and Endpoint".
+    * Note that you will **not** enter the API key in this file.  That'll happen in a later step.
+    * Update the name of the connection.  I named mine the same as the name of my Azure OpenAI instance.
+    * Update the endpoint URL.
+    * Save the file.
+    * When you save the file, it will automatically open the terminal and execute a command line.  This command line will prompt you for the API key.  You'll copy it from the Azure portal, and paste it into this command line app, which apparently squirrels away that api key in a secure way.
+3. After doing the above steps I can now see an entry under Connections/Azure OpenAI in the Prompt Flow window.
+
 # Basics
 In this section we'll begin working through the quick start and making notes along the way.
 
