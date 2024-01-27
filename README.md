@@ -205,7 +205,7 @@ This is because the deployment names I had in OpenAI were different from how thi
 
 I was then able to execute the flow from end to end.  There is an input URL specified at the beginning, which was an app on the Google Play store.  The flow fetches the content of the URL, and summarizes it.  Then it runs a prompt which classifies the URL into one of several categories.
 
-## Try my own thing
+## A quick change to the flow
 Now that I had something running, I made a few changes:
 1. I changed the input URL to https://mossms.com, a game which I made and is still love.
 2. I changed the categorization prompt to allow "Entertainment" as a category.  This involved changing the Jinja template.
@@ -213,3 +213,9 @@ Now that I had something running, I made a few changes:
 
 ## Suggestion: Remove flow detail
 I removed `flow.detail.json` and added it to gitignore; this doesn't seem like something that should be saved in git.  It contains the results from your last run.
+
+
+# Trying a new flow: PBI creator
+
+Let's try creating a new flow that is an interactive chat to create PBI (product backlog items), or "Stories".
+
