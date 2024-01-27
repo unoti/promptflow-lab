@@ -120,11 +120,26 @@ def prepare_examples():
 ```
 But it's not immediately clear how the output from `prepare_examples()` becomes the variable `examples` later on in the template.  There's nothing in the YAML flow that tells it to name the output from this function as `examples`.
 
-However, we can see the `@tool` marker on this function, and there's something in `.promptflow/flow.tools.json` that seems like it could be the missing link. 
-* But looking in there, too, I don't see how the output of `prepare_examples.py` becomes the input names `examples` in `classify_with_llm.jinjia2`. Perhaps this will become more clear later.
+However, we can see the `@tool` marker on this function, and there's something in `.promptflow/flow.tools.json` that seems like it could be the missing link. But looking in there, too, I don't see how the output of `prepare_examples.py` becomes the input names `examples` in `classify_with_llm.jinjia2`. Perhaps this will become more clear later.
 
 Let's prepare to run this flow by installing the requirements in requirements.txt.  I looked at those, and it's the 2 requirements we already installed for promptflow, plus Beautiful Soup 4 (an HTML parser).
 
 Run this:
 ```
+cd examples\flows\web-classification
+pip install -r requirements.txt
 ```
+
+### Install VS Code Extension
+There's a VS Code extension that lets you view and edit these flow DAGs in an awesome way. Let's try installing it.
+Click Here: [Prompt flow VS Code Extension](https://marketplace.visualstudio.com/items?itemName=prompt-flow.prompt-flow) or search for "Prompt flow" in the extensions marketplace, and install it.
+
+Hopefully this will work normally for you, but I had some difficulties.
+The marketplace was failing and giving me errors, so I needed to download it manually and install it.  The file I downloaded was a `.vsix` file, and I followed the instructions here to [manually install from a vsix file](https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix).
+
+In explorer, I right clicked on my Downloads folder, and selected "open a terminal here".  From there I did
+```
+code --install-extension .\prompt-flow.prompt-flow-1.9.2.vsix
+```
+
+After that I was able to see that the extension was installed in VS Code by clicking the Extensions icon.
