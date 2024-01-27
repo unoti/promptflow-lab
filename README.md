@@ -25,6 +25,25 @@ I used Python 3.11, but other versions may work.  The above doc suggests 3.9+.
     ```
     This should print the version of promptflow, in my case 1.4.1.
 
+# Questions
+These are questions I had while working through the materials, and things that puzzled me at first.  As I learn, I'll come back and update this with the answers I found.  You could skip this section, because it's spoilers and won't mean much to you until you dive in, but these things might help you if they seemed puzzling to you at first as you work through the examples.
+
+## Web classification `examples` variable``
+> Q: In the web classification example flow, there is a variable in the Jinja template for the LLM that loops through a variable called `examples`.  How is the output of `prepare_examples.py` which comes out as an unnamed list mapped into the variable `examples` in the Jinjia template? Examining the yaml, json, and .py I was unable to determine how this mapping happens.  Is it just because there's only a single input for the jinja template called `examples`, so that must just automatically map to the single input in the jinja template?
+
+* When I view the `classify_with_llm.jinja2` node in the Prompt Flow extension, I see a list of 3 inputs to this node, one of which is `examples*`.  In there I can see the value of this is `${prepare_examples.output}`.  This is where the mapping is happening.  The word `.output` must have special meaning for when the outputs are not named and are just the output.  Looking back at the flow.dag.yaml, I can see the same answer staring back at me, but somehow I didn't see it when it was just .yaml instead of a UI.  It's funny how user interfaces can work to make things more intuitive to the uninitiated.
+![image](img/template-output.png)
+
+## How to see the graph using the Prompt Flow Extension
+> Q: I've got the Prompt Flow vs code extension installed, and I've got a flow directory with yaml and everything ready to go.  How do I invoke the Prompt Flow extension and see the pretty DAG graph?
+* I haven't yet seen instructions in the docs on how to do this, but this is what I have figured out so far:
+* You can right click on any directory, and create a new flow here-- there is an additional context menu added.  But that is not really the answer to the question above.
+* You can press F1 and search for "flow" and select the command "Prompt Flow: Focus on Flows View".  This will open up a number of windows on the left side, including one called "Flows".  From there you can select examples\flows\web-classification, and click "Open".  Violá, you see a DAG.
+
+## How do I connect Prompt Flow to my Azure OpenAI instance?
+> Q: I've got the Prompt Flow extension running now. How do I set it up to talk to my Azure OpenAI instance?
+Once you have the extension running as above using F1 and then "Prompt Flow: Focus on Flows View" you will have a new icon on the left side of VS Code, a stylize "P" that is the Prompt Flow icon.  In there, you can click on that, and use the "Connections" window.  I discovered later this is discussed in the [docs: Manage Connections](https://microsoft.github.io/promptflow/how-to-guides/manage-connections.html).
+
 # Basics
 In this section we'll begin working through the quick start and making notes along the way.
 
@@ -143,3 +162,10 @@ code --install-extension .\prompt-flow.prompt-flow-1.9.2.vsix
 ```
 
 After that I was able to see that the extension was installed in VS Code by clicking the Extensions icon.
+
+### Flow Types
+There are three flow types in Prompt Flow:
+* **Chat Flow.** Used in development of an LLM application.  The Chat Flow is designed for interactive chat with a user.  It has chat_history, chat_input, and chat_output.  There is a simple chat application for deployment purposes.
+* **Standard Flow.** Used in development of an LLM application.  A normal flow, but without the chat history and UI. (Is this correct?)  Generally if you need conversation history, use a Chat Flow, otherwise use a Standard Flow.
+* **Evaluation Flow.** Creates metrics used for offline evaluation of the quality of responses, for example, "Is this answer fact based?"
+
