@@ -211,11 +211,77 @@ Now that I had something running, I made a few changes:
 2. I changed the categorization prompt to allow "Entertainment" as a category.  This involved changing the Jinja template.
 3. I ran the flow again, and it successfully categorized Mossms as "Entertainment".  I was able to inspect the outputs at each stage, and saw its brief 100 word description of Mossms, which was pretty acceptable, and certainly adequate to do the classification. It worked great!
 
-## Suggestion: Remove flow detail
+## Suggestion: Gitignore changes
 I removed `flow.detail.json` and added it to gitignore; this doesn't seem like something that should be saved in git.  It contains the results from your last run.
 
+We don't really want chat history in git either.  I also added these items to ``.gitignore`:
+```
+flow.detail.json
+chat.detail.json
+chat.output.json
+```
+
+
+# Interlude - OpenAI Deployments
+There are experiments I'm doing that require some more modern features that are only available in regions other than the one we used for our original OpenAI instance in March 2023.  So I created a new instance.
+ 
+The specific features I'm needing are:
+* JSON completion. This is an option where GPT will *only* respond as json objects.  As you might imagine, this can be a game changer for doing ReAct style flows and command generation.
+* GPT-4 support
+* GPT-4 32k token window size. I need this for certain things where there is a very large amount of context information the agent needs to answer a question.
+
+These things are features only available in certain Azure regions at this time.  For more information about which model deployments can support which features, and which regions you can deploy these things, see this ]Azure Open Model and Region Availability](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#gpt-35-turbo-model-availability).
 
 # Trying a new flow: PBI creator
 
-Let's try creating a new flow that is an interactive chat to create PBI (product backlog items), or "Stories".
+Let's try creating a new flow that is an interactive chat to create PBI's (product backlog items), or "Stories".
+
+
+## JSON Formatted Responses
+One of the aspects of this that I want to try at the same time is getting OpenAI to **always** respond in JSON.  I want to give it several kinds of interfaces to external systems, such as the ability to create and edit PBI's, and find out which features, epics, and stories the current user typically uses.  To do this, I want to use JSON formatted responses.  Let's experiment with that now.
+
+Note that to enable the options described here, you need to be using a deployment of OpenAI that is version 1106 or later.
+
+Although you can simply ask in the prompt for the response to be json using the normal text response format, newer versions of the model allow you to force responses in JSON at a more fundamental level.  Let's experiment with that now.
+
+The key to using JSON responses is to use `"response_format": {"type": "json_object"}`.
+
+First I changed my API call from the default `"response_format": {"type": "type"}` to `{"type": "json_object"}`, and I got an error like this:
+```
+OpenAI API hits BadRequestError: Error code: 400 - {'error': {'message': "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.", 'type': 'invalid_request_error', 'param': 'messages', 'code': None}} [Error reference: https://platform.openai.com/docs/guides/error-codes/api-errors]
+```
+I believe this means that my input prompt needs to in some way instruct the agent how to craft its JSON responses.  Let's update the prompt like this:
+
+```
+You are an assistant that specializes in tactical planning for the user.
+
+You can communicate both with the user, and to various internal systems and web services that are available to you.
+
+You will always respond in JSON.  To complete a user response may require several responses, each of which may either talk to the user to communicate with an integrated system.  Here are the available ways that you can respond, and each of these has an associated JSON format:
+
+## User Chat
+To say something back to the user, use a response like this:
+{ "command": "chat",
+  "parameters": {"message": "message to display to the user"}
+}
+
+## Weather
+To check the current weather and weather forecast, you can use this:
+{ "command": "weather",
+  "thought": "Use this text to show a small message to the user while this integration runs. For example, you might say you are checking to see if you might need a raincoat or other gear.  This field is optional."
+}
+
+The above are the only possible options you have when generating your response.  The user's initial question starts below.
+```
+
+Let's try that prompt and see what happens.  After changing my prompt to be like that, I put in the question:
+```
+> I'm getting ready to take a walk.
+```
+The agent then responded:
+```
+{ " command ": " weather ", " thought ": " Checking the current weather for your walk ." }
+```
+
+This is pretty great! I'm not enamored with the spaces in front of everything.  Maybe it's the web UI I'm working with, or maybe it's something else. Either way, we'll figure it out.  It looks like we've got the raw materials to get rocking here.
 
