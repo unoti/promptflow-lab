@@ -16,6 +16,18 @@
         }
       },
       "source": "chat.jinja2"
+    },
+    "execute_command.py": {
+      "type": "python",
+      "inputs": {
+        "input_json_str": {
+          "type": [
+            "string"
+          ]
+        }
+      },
+      "source": "execute_command.py",
+      "function": "my_python_tool"
     }
   }
 }

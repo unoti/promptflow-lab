@@ -13,10 +13,10 @@ inputs:
 outputs:
   answer:
     type: string
-    reference: ${chat.output}
+    reference: ${execute_command.output}
     is_chat_output: true
 nodes:
-- name: chat
+- name: LLM
   type: llm
   source:
     type: code
@@ -31,3 +31,10 @@ nodes:
       type: json_object
   connection: dana-openai-test-westus
   api: chat
+- name: execute_command
+  type: python
+  source:
+    type: code
+    path: execute_command.py
+  inputs:
+    input_json_str: ${LLM.output}

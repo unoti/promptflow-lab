@@ -56,6 +56,23 @@ Steps I did:
     * When you save the file, it will automatically open the terminal and execute a command line.  This command line will prompt you for the API key.  You'll copy it from the Azure portal, and paste it into this command line app, which apparently squirrels away that api key in a secure way.
 3. After doing the above steps I can now see an entry under Connections/Azure OpenAI in the Prompt Flow window.
 
+## Loops: Am I missing something?
+There are two key ways where we need loops.
+1. I need a flow like this:
+  * Find similar tickets to what the user is asking about.
+  * For each of those similar tickets, use the LLM to do some analaysis about them.
+  * Bring the results of the above together, and make some recommendations.
+2. The user is asking about something, and there are several different external integrations which may be needed.  It may take several rounds of conversation both with the user and with external systems to get to what we need.
+
+So far, I don't see how to do either of these two kinds of loops in Prompt Flow.  I wonder what I'm missing?
+
+In trying to figure this out, I'm going to carefully study this, which sounds like it would certainly involve at least one of the above kinds of loops:
+[PromptFlow Autonomous Agent Example](https://github.com/microsoft/promptflow/blob/main/examples/flows/standard/autonomous-agent/README.md)
+
+Things that look useful:
+* JSON parsing and other things in [util.py](https://github.com/microsoft/promptflow/blob/main/examples/flows/standard/autonomous-agent/util.py)
+* Creating chat messages using proper role formatting
+
 # Basics
 In this section we'll begin working through the quick start and making notes along the way.
 
@@ -237,7 +254,9 @@ These things are features only available in certain Azure regions at this time. 
 Let's try creating a new flow that is an interactive chat to create PBI's (product backlog items), or "Stories".
 
 
-## JSON Formatted Responses
+## Working with JSON Formatted Responses
+For this section, we're working with the flow in `flows\json-lab`.
+
 One of the aspects of this that I want to try at the same time is getting OpenAI to **always** respond in JSON.  I want to give it several kinds of interfaces to external systems, such as the ability to create and edit PBI's, and find out which features, epics, and stories the current user typically uses.  To do this, I want to use JSON formatted responses.  Let's experiment with that now.
 
 Note that to enable the options described here, you need to be using a deployment of OpenAI that is version 1106 or later.
@@ -283,5 +302,12 @@ The agent then responded:
 { " command ": " weather ", " thought ": " Checking the current weather for your walk ." }
 ```
 
-This is pretty great! I'm not enamored with the spaces in front of everything.  Maybe it's the web UI I'm working with, or maybe it's something else. Either way, we'll figure it out.  It looks like we've got the raw materials to get rocking here.
+This is pretty great!  I'm excited about it ebcause I've spent so much time doing this manually before. I'm not loving the  spaces in front of everything.  Maybe it's the web UI I'm working with, or maybe it's something else. Either way, we'll figure it out.  It looks like we've got the raw materials to get rocking here.
 
+The JSON response is nice, but maybe what I really want to use here is function calling.
+See [OpenAI Function Calling](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb)
+
+
+
+## Interfacing to external systems
+I have the agent expressing its intent to check the weather via a json message.  Now let's put some Python code in place to inspect the message from the agent and determine execute the user ask.
